@@ -48,22 +48,12 @@ class RAGService:
                 "sources": []
             }
 
-        # 2. Build context prompt block and collect citations
-        context_snippets = []
+        # 2. Compile deduplicated citation list first to establish stable array indices
         sources = []
         seen_citations = set()
-
-        for idx, chunk in enumerate(retrieved_chunks, 1):
+        for chunk in retrieved_chunks:
             source_file = chunk["metadata"]["source"]
             page_num = chunk["metadata"]["page"]
-            content = chunk["content"]
-
-            # Format individual text snippet
-            context_snippets.append(
-                f"Snippet [{idx}]:\nSource: {source_file}\nPage: {page_num}\nContent:\n{content}\n---"
-            )
-
-            # Record and deduplicate citations
             citation_key = (source_file, page_num)
             if citation_key not in seen_citations:
                 seen_citations.add(citation_key)
@@ -72,12 +62,28 @@ class RAGService:
                     "page": page_num
                 })
 
+        # 3. Build context blocks mapped to their 1-based source indices
+        context_snippets = []
+        for chunk in retrieved_chunks:
+            source_file = chunk["metadata"]["source"]
+            page_num = chunk["metadata"]["page"]
+            content = chunk["content"]
+
+            # Locate index in deduplicated sources list
+            source_idx = sources.index({"file": source_file, "page": page_num}) + 1
+
+            context_snippets.append(
+                f"Snippet [{source_idx}]:\nSource: {source_file}\nPage: {page_num}\nContent:\n{content}\n---"
+            )
+
         context_str = "\n\n".join(context_snippets)
 
-        # 3. Construct prompt incorporating context constraints
+        # 4. Construct prompt incorporating context constraints and inline index instructions
         prompt = (
             "You are a precise document synthesis assistant. Your task is to answer the user's question "
-            "based strictly and ONLY on the provided document snippets. If the snippets do not contain "
+            "based strictly and ONLY on the provided document snippets. For every claim or fact you state, "
+            "you MUST cite the source Snippet index inline using square brackets (e.g. [1], [2], or [1][3]). "
+            "Place these citations at the end of the sentence or clause they support. If the snippets do not contain "
             "the answer or if you are unsure, state clearly that you cannot find the answer in the provided documents. "
             "Do not make up facts or extrapolate beyond the provided text.\n\n"
             f"Context Snippets:\n{context_str}\n\n"
