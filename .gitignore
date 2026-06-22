@@ -20,3 +20,5 @@ requirements.txt
 Rules.md
 Schema.md
 SOP.md
+*.db
+app/storage/*.db
