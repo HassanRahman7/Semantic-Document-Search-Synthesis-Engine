@@ -70,7 +70,7 @@ class PDFService:
             # 2. Extract text page-by-page
             pages_data = cls.extract_pages(file_path)
             
-            # 3. Create page records
+            # 3. Create and save page records in SQLite
             db_pages = []
             for p in pages_data:
                 db_page = DBPage(
@@ -82,7 +82,15 @@ class PDFService:
                 
             db.bulk_save_objects(db_pages)
             
-            # 4. Update document metadata with status 'indexed'
+            # 4. Generate overlapping text chunks
+            from app.services.chunking_service import ChunkingService
+            chunks = ChunkingService.split_pages(db_pages, file_name=file_name)
+            
+            # 5. Embed and save chunks in local ChromaDB
+            from app.services.vector_store_service import VectorStoreService
+            VectorStoreService.add_documents(chunks)
+            
+            # 6. Update document metadata with status 'indexed' and page count
             db_doc.total_pages = len(pages_data)
             db_doc.status = "indexed"
             db.commit()
