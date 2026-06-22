@@ -1,6 +1,7 @@
 import os
 import logging
-from typing import List
+import hashlib
+from typing import List, Optional
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
@@ -82,3 +83,59 @@ class VectorStoreService:
         except Exception as e:
             logger.error(f"Failed to delete document {document_id} from ChromaDB: {str(e)}", exc_info=True)
             raise RuntimeError(f"Error deleting from vector store: {str(e)}")
+
+    @classmethod
+    def search(
+        cls, query: str, document_id: Optional[str] = None, top_k: int = 5
+    ) -> List[dict]:
+        """Performs semantic similarity search in ChromaDB with optional document_id filtering.
+
+        Args:
+            query: The text query to search for.
+            document_id: Optional UUID to search exclusively in.
+            top_k: Number of matching chunks to retrieve.
+
+        Returns:
+            A list of dictionary results matching the SearchResponse schema.
+        """
+        logger.info(f"Initiating search: query='{query}', document_id={document_id}, top_k={top_k}")
+        try:
+            vector_store = cls.get_vector_store()
+
+            search_filter = None
+            if document_id:
+                search_filter = {"document_id": document_id}
+
+            # Executing similarity search with score
+            results_with_scores = vector_store.similarity_search_with_score(
+                query,
+                k=top_k,
+                filter=search_filter
+            )
+
+            formatted_results = []
+            for doc, score in results_with_scores:
+                # Retrieve document ID from langchain doc if available, or generate from metadata
+                chunk_id = getattr(doc, "id", None)
+                if not chunk_id:
+                    # Fallback to MD5 hash of chunk content to maintain schema consistency
+                    chunk_id = hashlib.md5(doc.page_content.encode("utf-8")).hexdigest()
+
+                formatted_results.append({
+                    "chunk_id": chunk_id,
+                    "content": doc.page_content,
+                    "score": float(score),
+                    "metadata": {
+                        "document_id": doc.metadata.get("document_id"),
+                        "source": doc.metadata.get("source"),
+                        "page": int(doc.metadata.get("page", 1))
+                    }
+                })
+
+            logger.info(f"Search successfully retrieved {len(formatted_results)} matching chunks.")
+            return formatted_results
+
+        except Exception as e:
+            logger.error(f"Search query execution failed: {str(e)}", exc_info=True)
+            raise e
+
