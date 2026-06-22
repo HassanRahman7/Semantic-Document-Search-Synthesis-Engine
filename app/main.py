@@ -2,6 +2,7 @@ import logging
 from fastapi import FastAPI
 from app.api.upload import router as upload_router
 from app.api.search import router as search_router
+from app.api.query import router as query_router
 from app.storage.database import init_db
 
 # Configure logging format
@@ -20,6 +21,7 @@ app = FastAPI(title="Semantic Document Search & Synthesis Engine", version="1.0"
 # Register routes
 app.include_router(upload_router, prefix="/api/v1")
 app.include_router(search_router, prefix="/api/v1")
+app.include_router(query_router, prefix="/api/v1")
 
 @app.get("/api/health")
 def health_check() -> dict:
