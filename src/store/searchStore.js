@@ -1,18 +1,23 @@
 import { create } from 'zustand';
 
 export const useSearchStore = create((set) => ({
-  searchQuery: '',
-  searchResults: [],
-  isSearching: false,
-  selectedDocIdFilter: '', // optional filter by document
+  currentQuestion: '',
+  isSearchFocused: false,
+  showSources: true,
+  selectedDocIdFilter: '', // optional UUID of document to restrict search
 
-  setSearchQuery: (query) => set({ searchQuery: query }),
+  setCurrentQuestion: (question) => set({ currentQuestion: question }),
   
-  setSearchResults: (results) => set({ searchResults: results }),
+  setSearchFocused: (focused) => set({ isSearchFocused: focused }),
   
-  setSearching: (searching) => set({ isSearching: searching }),
+  setShowSources: (show) => set({ showSources: show }),
   
-  setDocIdFilter: (docId) => set({ selectedDocIdFilter: docId }),
+  setSelectedDocIdFilter: (docId) => set({ selectedDocIdFilter: docId }),
   
-  clearSearch: () => set({ searchQuery: '', searchResults: [], selectedDocIdFilter: '' }),
+  resetSearchUI: () => set({
+    currentQuestion: '',
+    isSearchFocused: false,
+    showSources: true,
+    selectedDocIdFilter: '',
+  }),
 }));

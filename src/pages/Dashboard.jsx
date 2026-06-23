@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Database, ShieldAlert, Cpu, ArrowRight, RefreshCw, AlertCircle } from 'lucide-react';
+import { FileText, Database, ShieldAlert, Cpu, ArrowRight, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
 import PageContainer from '../components/PageContainer';
 import Card from '../components/Card';
 import Button from '../components/Button';
@@ -29,7 +29,7 @@ export default function Dashboard() {
   return (
     <PageContainer>
       {/* Visual Hero Section */}
-      <div className="relative py-16 md:py-20 mb-12 rounded-card overflow-hidden bg-gradient-to-br from-[#1d1b1a] to-surface border border-white/5 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
+      <div className="relative py-16 md:py-20 mb-8 rounded-card overflow-hidden bg-gradient-to-br from-[#1d1b1a] to-surface border border-white/5 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
         {/* Glow Layer */}
         <div className="absolute top-0 left-0 w-80 h-80 rounded-full bg-primary/10 blur-[100px] pointer-events-none" />
         
@@ -61,6 +61,36 @@ export default function Dashboard() {
           <div className="absolute top-8 left-8 w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_#34D399]" />
           <div className="absolute bottom-12 right-10 w-3 h-3 rounded-full bg-primary shadow-[0_0_12px_#E4573D]" />
         </div>
+      </div>
+
+      {/* Quick Ask Section */}
+      <div className="mb-12">
+        <Card 
+          hoverEffect={true} 
+          onClick={() => navigate('/search')} 
+          className="cursor-pointer border-primary/20 bg-primary/[0.01] hover:bg-primary/[0.03] p-6 flex flex-col md:flex-row items-center justify-between gap-4"
+        >
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-[16px] bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+              <Sparkles className="w-6 h-6 animate-pulse" />
+            </div>
+            <div className="text-left">
+              <h3 className="text-white font-medium text-sm md:text-base">Quick Ask</h3>
+              <p className="text-textSecondary text-xs font-light">
+                Have a question? Head over to the Search Workspace to query your indexed files instantly.
+              </p>
+            </div>
+          </div>
+          <Button 
+            variant="primary" 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              navigate('/search'); 
+            }}
+          >
+            Open Search Workspace <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
