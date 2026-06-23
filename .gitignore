@@ -22,3 +22,6 @@ Schema.md
 SOP.md
 *.db
 app/storage/*.db
+node_modules/
+dist/
+.eslintcache
