@@ -8,6 +8,7 @@ import Badge from '../components/Badge';
 import DocumentStatusBadge from '../components/documents/DocumentStatusBadge';
 import UploadDropzone from '../components/upload/UploadDropzone';
 import { useDocuments } from '../hooks/documents/useDocuments';
+import { useWorkspaceStore } from '../store/workspaceStore';
 
 // Helper to format file sizes
 function formatBytes(bytes, decimals = 1) {
@@ -22,6 +23,7 @@ function formatBytes(bytes, decimals = 1) {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { data: documents, isLoading, isError, error, refetch } = useDocuments();
+  const { searchHistory } = useWorkspaceStore();
 
   // Get 5 most recent documents
   const recentDocuments = documents ? [...documents].slice(0, 5) : [];
@@ -90,6 +92,41 @@ export default function Dashboard() {
           >
             Open Search Workspace <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
+        </Card>
+      </div>
+
+      {/* Knowledge Base Overview Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+        <Card hoverEffect={false} className="p-5 flex items-center space-x-4 border-white/5 bg-[#121110]/40">
+          <div className="w-12 h-12 rounded-[16px] bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+            <Database className="w-5 h-5" />
+          </div>
+          <div className="text-left">
+            <span className="text-[10px] font-mono tracking-widest text-textSecondary/70 uppercase block">// DOCUMENTS INDEXED</span>
+            <span className="text-2xl font-semibold text-white mt-1 block">{documents?.length || 0}</span>
+          </div>
+        </Card>
+
+        <Card hoverEffect={false} className="p-5 flex items-center space-x-4 border-white/5 bg-[#121110]/40">
+          <div className="w-12 h-12 rounded-[16px] bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+            <FileText className="w-5 h-5" />
+          </div>
+          <div className="text-left">
+            <span className="text-[10px] font-mono tracking-widest text-textSecondary/70 uppercase block">// TOTAL PAGES PARSED</span>
+            <span className="text-2xl font-semibold text-white mt-1 block">
+              {documents?.reduce((acc, curr) => acc + (curr.total_pages || 0), 0) || 0}
+            </span>
+          </div>
+        </Card>
+
+        <Card hoverEffect={false} className="p-5 flex items-center space-x-4 border-white/5 bg-[#121110]/40">
+          <div className="w-12 h-12 rounded-[16px] bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+            <Sparkles className="w-5 h-5 animate-pulse" />
+          </div>
+          <div className="text-left">
+            <span className="text-[10px] font-mono tracking-widest text-textSecondary/70 uppercase block">// RECENT QUESTIONS</span>
+            <span className="text-2xl font-semibold text-white mt-1 block">{searchHistory?.length || 0}</span>
+          </div>
         </Card>
       </div>
 
