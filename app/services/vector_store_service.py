@@ -1,13 +1,10 @@
-import os
 import logging
 import hashlib
 from typing import List, Optional
-from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
 from app.services.embedding_service import EmbeddingService
-
-load_dotenv()
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +17,7 @@ class VectorStoreService:
         Uses a class-level singleton cache to preserve connection.
         """
         if cls._vector_store is None:
-            persist_dir = os.getenv("CHROMA_DB_DIR", "chroma_db")
+            persist_dir = settings.CHROMA_DB_DIR
             logger.info(f"Connecting to ChromaDB at directory: {persist_dir}")
             try:
                 embeddings = EmbeddingService.get_embeddings()

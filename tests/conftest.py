@@ -40,6 +40,12 @@ def temp_chroma_dir():
     """Sets up an isolated, temporary ChromaDB persist directory for test session."""
     temp_dir = tempfile.mkdtemp()
     os.environ["CHROMA_DB_DIR"] = temp_dir
+    
+    # Override settings attributes directly to override values evaluated at import-time
+    from app.core.config import settings
+    settings.CHROMA_DB_DIR = temp_dir
+    settings.DATABASE_URL = f"sqlite:///{temp_db_path}"
+    
     # Force singleton reset
     VectorStoreService._vector_store = None
     yield temp_dir

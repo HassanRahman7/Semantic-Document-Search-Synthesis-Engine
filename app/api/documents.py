@@ -6,11 +6,11 @@ from datetime import datetime
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
-from dotenv import load_dotenv
 from app.storage.database import get_db
 from app.storage.db_models import DBDocument
 from app.services.pdf_service import PDFService
 from app.services.vector_store_service import VectorStoreService
+from app.core.config import settings
 
 # Pydantic schemas for document management responses
 class DocumentResponse(BaseModel):
@@ -28,15 +28,13 @@ class DocumentResponse(BaseModel):
 class DocumentListResponse(BaseModel):
     documents: List[DocumentResponse]
 
-load_dotenv()
-
 # Configure logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
-# Load file size limits from .env (default to 50MB)
-MAX_FILE_SIZE_MB = int(os.getenv("MAX_FILE_SIZE_MB", 50))
+# Load file size limits from settings
+MAX_FILE_SIZE_MB = settings.MAX_FILE_SIZE_MB
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 @router.post("/upload", status_code=status.HTTP_201_CREATED)
@@ -91,8 +89,8 @@ async def upload_document(
                 detail=f"File exceeds maximum allowed size of {MAX_FILE_SIZE_MB}MB."
             )
 
-        # 4. Save file locally in 'uploads' directory
-        uploads_dir = "uploads"
+        # 4. Save file locally in configured uploads directory
+        uploads_dir = settings.UPLOADS_DIR
         os.makedirs(uploads_dir, exist_ok=True)
         
         # Generate a unique filename to prevent collisions

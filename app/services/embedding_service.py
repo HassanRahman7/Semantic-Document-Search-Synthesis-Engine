@@ -1,5 +1,6 @@
 import logging
 from langchain_huggingface import HuggingFaceEmbeddings
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -8,11 +9,11 @@ class EmbeddingService:
 
     @classmethod
     def get_embeddings(cls) -> HuggingFaceEmbeddings:
-        """Loads and returns the local embedding model BAAI/bge-small-en-v1.5.
+        """Loads and returns the local embedding model configured in settings.
         Uses a class-level singleton cache to avoid loading the model weights multiple times.
         """
         if cls._embeddings is None:
-            model_name = "BAAI/bge-small-en-v1.5"
+            model_name = settings.EMBEDDING_MODEL
             logger.info(f"Loading local embedding model: {model_name}")
             try:
                 cls._embeddings = HuggingFaceEmbeddings(

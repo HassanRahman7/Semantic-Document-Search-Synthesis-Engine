@@ -1,11 +1,8 @@
-import os
 import logging
 from typing import Any, List
-from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-load_dotenv()
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +18,9 @@ class ChunkingService:
         Returns:
             A list of split Document objects with metadata attached.
         """
-        # Load parameters from environment (default: size 500, overlap 50)
-        chunk_size = int(os.getenv("CHUNK_SIZE", 500))
-        chunk_overlap = int(os.getenv("CHUNK_OVERLAP", 50))
+        # Load parameters from central settings
+        chunk_size = settings.CHUNK_SIZE
+        chunk_overlap = settings.CHUNK_OVERLAP
 
         logger.info(f"Starting chunking for {file_name} (pages: {len(db_pages)}, chunk_size: {chunk_size}, overlap: {chunk_overlap})")
 

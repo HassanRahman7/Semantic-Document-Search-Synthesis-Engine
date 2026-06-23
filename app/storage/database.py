@@ -1,12 +1,9 @@
-import os
 from typing import Generator
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+from app.core.config import settings
 
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///app/storage/metadata.db")
+DATABASE_URL = settings.DATABASE_URL
 
 # For SQLite, we need to allow multiple threads to access it (FastAPI runs routes concurrently)
 connect_args = {}

@@ -3,6 +3,7 @@ import logging
 from typing import Any, Dict, List, Optional
 import google.generativeai as genai
 from app.services.vector_store_service import VectorStoreService
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ class RAGService:
         Raises configuration error if the key is missing.
         """
         if not cls._initialized:
-            api_key = os.getenv("GEMINI_API_KEY")
+            api_key = settings.GEMINI_API_KEY
             if not api_key:
                 logger.error("GEMINI_API_KEY environment variable is missing.")
                 raise ValueError("GEMINI_API_KEY is not configured in environment variables.")
