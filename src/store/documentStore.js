@@ -1,32 +1,16 @@
 import { create } from 'zustand';
 
 export const useDocumentStore = create((set) => ({
-  documents: [],
   selectedDocument: null,
-  isLoading: false,
-  uploadProgress: {}, // file-name to progress mapping
+  uploadDialogOpen: false,
+  activeFilter: 'all', // 'all', 'indexed', 'processing', 'failed'
+  deleteTargetDocument: null, // document metadata of target to delete
 
-  setDocuments: (docs) => set({ documents: docs }),
-  
   setSelectedDocument: (doc) => set({ selectedDocument: doc }),
   
-  setLoading: (loading) => set({ isLoading: loading }),
+  setUploadDialogOpen: (open) => set({ uploadDialogOpen: open }),
   
-  setUploadProgress: (fileName, progress) => 
-    set((state) => ({
-      uploadProgress: { ...state.uploadProgress, [fileName]: progress }
-    })),
-    
-  clearUploadProgress: (fileName) => 
-    set((state) => {
-      const newProgress = { ...state.uploadProgress };
-      delete newProgress[fileName];
-      return { uploadProgress: newProgress };
-    }),
-
-  removeDocument: (docId) =>
-    set((state) => ({
-      documents: state.documents.filter((d) => d.document_id !== docId),
-      selectedDocument: state.selectedDocument?.document_id === docId ? null : state.selectedDocument
-    })),
+  setActiveFilter: (filter) => set({ activeFilter: filter }),
+  
+  setDeleteTargetDocument: (doc) => set({ deleteTargetDocument: doc }),
 }));
